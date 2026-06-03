@@ -1,0 +1,16 @@
+[package]
+name = "slugify-rs"
+version = "0.1.0"
+edition = "2021"
+description = "Convert arbitrary Unicode text into clean, URL-safe slugs with accent transliteration, custom separators, and smart max-length."
+license = "MIT"
+repository = "https://github.com/roekdee/slugify-rs"
+readme = "README.md"
+keywords = ["slug", "url", "text", "transliterate", "unicode"]
+categories = ["text-processing"]
+
+[lib]
+name = "slugify_rs"
+path = "src/lib.rs"
+
+[dependencies]

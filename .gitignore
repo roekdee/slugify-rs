@@ -1,0 +1,9 @@
+# Build artifacts
+/target/
+
+# Lockfile is not committed for library crates
+Cargo.lock
+
+# Editor / OS noise
+*.swp
+.DS_Store
