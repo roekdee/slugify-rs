@@ -1,16 +1,8 @@
 # slugify-rs
 
-Turn arbitrary Unicode text into clean, URL-safe slugs — accent-aware, dependency-free, and configurable.
+Turns arbitrary text into URL-safe slugs — `Café Déjà` becomes `cafe-deja`. It transliterates accented Latin characters to ASCII, lowercases, and joins words with hyphens. No dependencies.
 
 ![CI](https://github.com/roekdee/slugify-rs/actions/workflows/ci.yml/badge.svg)
-
-## Features
-
-- **Unicode-aware transliteration** — accented Latin characters become ASCII (`Café Déjà` → `cafe-deja`), and ligatures expand correctly (`Straße` → `strasse`, `Œuvre` → `oeuvre`).
-- **Sensible defaults** — lowercase, hyphen-separated, edges trimmed, runs of junk collapsed to a single separator.
-- **Configurable** via an `Options` builder: custom separator, preserve-case, and a max-length that never cuts a word in half.
-- **Graceful degradation** — emoji and unsupported scripts act as word breaks instead of producing garbage.
-- **Zero dependencies** — standard library only, `#![forbid(unsafe_code)]`.
 
 ## Usage
 
@@ -19,20 +11,20 @@ Add the crate to your `Cargo.toml`, then:
 ```rust
 use slugify_rs::{slugify, slugify_with, Options};
 
-// Defaults: lowercase, hyphen separator, trimmed.
 assert_eq!(slugify("Hello, World!"), "hello-world");
 assert_eq!(slugify("Crème Brûlée"), "creme-brulee");
-assert_eq!(slugify("Rock & Roll"), "rock-and-roll");
+assert_eq!(slugify("Rock & Roll"), "rock-and-roll");  // & maps to "and"
 
-// Custom options via a chainable builder.
+// Options is a small builder if you want to change the defaults.
 let opts = Options::new()
     .separator('_')
     .preserve_case(true)
     .max_length(16);
 
-// "The_Quick_Brown_Fox" trimmed to the last word boundary within 16 bytes.
 assert_eq!(slugify_with("The Quick Brown Fox", &opts), "The_Quick_Brown");
 ```
+
+Defaults are lowercase, hyphen separator, edges trimmed, and runs of separators collapsed. The `max_length` cap trims at a word boundary rather than mid-word. Anything that isn't ASCII-alphanumeric and has no transliteration (emoji, scripts I don't cover) is treated as a word break, so you get a clean slug instead of garbage.
 
 ## Build & test
 
@@ -40,14 +32,15 @@ assert_eq!(slugify_with("The Quick Brown Fox", &opts), "The_Quick_Brown");
 cargo test
 ```
 
-This runs the unit tests, the integration tests in `tests/`, and the runnable
-examples in the doc comments (doc-tests).
+That runs the unit tests, the integration tests in `tests/`, and the doc-tests in the examples above.
 
-## Tech
+## Notes
 
-- Rust 2021 edition
-- Standard library only (no runtime dependencies)
-- CI on GitHub Actions: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test`
+The accent table is hand-written and covers Latin-1 plus Latin Extended-A — that's most Western European text, including the ligatures people actually hit (`Straße` → `strasse`, `Œuvre` → `oeuvre`). I kept it as a static lookup rather than pulling in a full Unicode normalization crate because the dependency wasn't worth it for the range I care about. The crate is `#![forbid(unsafe_code)]`.
+
+The flip side is that anything outside that table (Cyrillic, Greek, CJK) just drops to separators rather than transliterating. If I needed those, I'd reach for `unicode-normalization` / `deunicode` instead of extending the table by hand.
+
+Rust 2021. CI checks `cargo fmt`, `cargo clippy`, and `cargo test`.
 
 ## License
 
