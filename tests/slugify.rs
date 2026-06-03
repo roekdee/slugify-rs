@@ -105,7 +105,10 @@ fn max_length_exact_boundary() {
 fn max_length_first_word_longer_than_limit() {
     // The first word exceeds the cap, so we keep it rather than return nothing.
     let opts = Options::new().max_length(3);
-    assert_eq!(slugify_with("internationalization wins", &opts), "internationalization");
+    assert_eq!(
+        slugify_with("internationalization wins", &opts),
+        "internationalization"
+    );
 }
 
 #[test]
@@ -116,5 +119,8 @@ fn combined_options() {
         .max_length(16);
     // "The_Quick_Brown_Fox" is 19 bytes. slug[..16] is "The_Quick_Brown_",
     // and the last '_' boundary within budget cuts back to "The_Quick_Brown".
-    assert_eq!(slugify_with("The Quick Brown Fox", &opts), "The_Quick_Brown");
+    assert_eq!(
+        slugify_with("The Quick Brown Fox", &opts),
+        "The_Quick_Brown"
+    );
 }
